@@ -4,7 +4,7 @@ import Register from "./page/Register";
 import { Toaster } from "react-hot-toast";
 import Chats from "./page/Chats";
 import Chat from "./page/Chat";
-export const BASE_URL = "http://localhost:8000/api/v1";
+export const BASE_URL = "https://gp-f2nx.onrender.com/api/v1";
 function App() {
   return (
     <>
