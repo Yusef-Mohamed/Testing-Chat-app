@@ -62,10 +62,11 @@ const ChatBox = () => {
   useEffect(() => {
     if (chatDetails?.isGroupChat) {
       console.log("create group chat");
+      console.log(chatDetails);
       socket.current.emit("create-group-chat", {
         chatId,
         members: chatDetails?.participants?.map(
-          (participant) => participant.userId._id
+          (participant) => participant?.userId?._id
         ),
       });
     }
