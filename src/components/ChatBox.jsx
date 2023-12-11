@@ -45,12 +45,16 @@ const ChatBox = () => {
   // Connect to Socket.io
 
   useEffect(() => {
+    // socket.current = io("ws://localhost:8000", {
     socket.current = io("https://gp-f2nx.onrender.com", {
       query: {
         token: localStorage.getItem("token"),
       },
     });
-    socket.current.emit("new-user-add", myId);
+    socket.current.emit("new-user-in-chat", {
+      user: myId,
+      chat: chatId,
+    });
     socket.current.on("get-users", (users) => {
       setOnlineUsers(users);
     });

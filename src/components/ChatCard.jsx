@@ -1,16 +1,8 @@
 import { FaUser } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import { getChatName } from "../action/getChatName";
 
 const ChatCard = ({ data }) => {
-  // const recevierUser = null;
-
-  // if (data?.participants?.length !== 0) {
-  //   recevierUser = data?.participants?.filter(
-  //     (participant) =>
-  //       // participant?.userId._id !== JSON.parse(localStorage.getItem("user"))._id
-  //       participant.userId !== JSON.parse(localStorage.getItem("user"))._id
-  //   )[0];
-  // }
   return (
     <Link
       to={`/chat/${data._id}`}
@@ -20,7 +12,8 @@ const ChatCard = ({ data }) => {
         <FaUser />
       </div>
       <div>
-        {/* <h1 className="font-semibold">{recevierUser?.userId?.name}</h1>
+        <h1 className="font-semibold">{getChatName(data)}</h1>
+        {/* 
         <p className="text-gray-400">{recevierUser?.userId?.email}</p> */}
       </div>
     </Link>

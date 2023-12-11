@@ -7,10 +7,12 @@ const MessageSender = ({ chatData, setSendMessage, setMessages }) => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatId = useParams().id;
+
   const receiverId = chatData?.participants?.find(
     (participant) =>
       participant.userId._id !== JSON.parse(localStorage.getItem("user"))._id
-  ).userId._id;
+  )?.userId?._id;
+
   const onSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -26,12 +28,12 @@ const MessageSender = ({ chatData, setSendMessage, setMessages }) => {
       )
       .then((res) => {
         setMessage("");
-        const messageData = {};
         setSendMessage({
           // receiverId: chatId,
           senderId: JSON.parse(localStorage.getItem("user"))._id,
           receiverId: chatData?.isGroupChat ? chatId : receiverId,
           chatType: chatData?.isGroupChat ? "group" : "user",
+          chatId: chatId,
           message: { text: res.data },
         });
         setMessages((prev) => [...prev, res.data]);
