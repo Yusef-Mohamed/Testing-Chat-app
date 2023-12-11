@@ -15,8 +15,7 @@ function App() {
 
   useEffect(() => {
     if (token) {
-      // socket.current = io("ws://localhost:8000", {
-      socket.current = io("https://gp-f2nx.onrender.com", {
+      socket.current = io("ws://localhost:8000", {
         query: {
           token: localStorage.getItem("token"),
         },

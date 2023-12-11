@@ -1,5 +1,3 @@
-// ChatBox.js
-
 import { useEffect, useRef, useState } from "react";
 import axiosIntance from "../config/axios.config";
 import ChatHeader from "./ChatHeader";
