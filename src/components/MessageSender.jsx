@@ -28,6 +28,7 @@ const MessageSender = ({ chatData, setSendMessage, setMessages }) => {
       )
       .then((res) => {
         setMessage("");
+        console.log(res.data);
         setSendMessage({
           // receiverId: chatId,
           senderId: JSON.parse(localStorage.getItem("user"))._id,
