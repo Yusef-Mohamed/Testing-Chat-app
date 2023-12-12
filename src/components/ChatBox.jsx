@@ -72,6 +72,7 @@ const ChatBox = ({ setIsMenuOpen }) => {
   // Send Message to socket server
   useEffect(() => {
     if (sendMessage !== null && socket) {
+      console.log("sending", sendMessage);
       socket.emit("send-message", sendMessage);
     }
   }, [sendMessage, socket]);
