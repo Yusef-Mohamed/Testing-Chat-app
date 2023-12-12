@@ -77,7 +77,6 @@ const ChatBox = ({ setIsMenuOpen }) => {
     }
   }, [sendMessage, socket]);
   // Get the message from socket server
-  console.log(messages);
   useEffect(() => {
     if (socket) {
       socket.on("receive-message", (data) => {
@@ -94,7 +93,6 @@ const ChatBox = ({ setIsMenuOpen }) => {
       });
       socket.on("deleted-message", (data) => {
         console.log("delete", data);
-
         setMessages((prev) =>
           prev.filter((message) => message._id !== data.messageId)
         );
