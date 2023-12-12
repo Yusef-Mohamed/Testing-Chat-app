@@ -8,13 +8,12 @@ const ChatCard = ({ data }) => {
       to={`/chat/${data._id}`}
       className="p-4 border border-gray-600 rounded-md flex items-center gap-4"
     >
-      <div className="flex items-center justify-center w-12 h-12 bg-slate-600 rounded-full">
+      <div className="flex  items-center justify-center  w-12 h-12 bg-slate-600 rounded-full">
         <FaUser />
       </div>
-      <div>
+      <div className="flex-1">
         <h1 className="font-semibold">{getChatName(data)}</h1>
-        {/* 
-        <p className="text-gray-400">{recevierUser?.userId?.email}</p> */}
+        <p className="text-gray-400 line-clamp-1">{data?.lastMessage?.text}</p>
       </div>
     </Link>
   );

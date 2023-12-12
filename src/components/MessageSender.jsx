@@ -1,64 +1,136 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import axiosIntance from "../config/axios.config";
 import { FaSpinner } from "react-icons/fa6";
+import InputEmojiWithRef from "react-input-emoji";
+import { ChatContext } from "./ChatBox";
+import { getReceiverId } from "../action/getReciverId";
 
-const MessageSender = ({ chatData, setSendMessage, setMessages }) => {
+const MessageSender = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const chatId = useParams().id;
+  const {
+    chatData,
+    setSendMessage,
+    setMessages,
+    setReplayToMessage,
+    replayToMessage,
+    messageToEdit,
+    setMessageToEdit,
+  } = useContext(ChatContext);
+  const receiverId = getReceiverId(chatData);
+  const onSubmit = () => {
+    if (message !== "") {
+      if (messageToEdit) {
+        setIsLoading(true);
+        console.log(messageToEdit._id);
+        axiosIntance
+          .put(
+            `/message/${messageToEdit._id}`,
+            { text: message },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
+          .then((res) => {
+            setMessage("");
+            setMessageToEdit(null);
+            setSendMessage({
+              senderId: JSON.parse(localStorage.getItem("user"))._id,
+              receiverId: chatData?.isGroupChat ? chatId : receiverId,
+              chatType: chatData?.isGroupChat ? "group" : "user",
+              chatId: chatId,
+              message: res.data,
+              type: "edit",
+            });
+            setMessages((prev) =>
+              prev.map((message) =>
+                message._id === res.data._id ? res.data : message
+              )
+            );
+          })
+          .catch((err) => console.log(err))
+          .finally(() => setIsLoading(false));
+      } else {
+        setIsLoading(true);
+        axiosIntance
+          .post(
+            `${
+              replayToMessage
+                ? `/message/${replayToMessage._id}/reply`
+                : `/message/${chatId}`
+            }`,
+            { text: message },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
+          .then((res) => {
+            setMessage("");
+            setReplayToMessage(null);
+            setSendMessage({
+              senderId: JSON.parse(localStorage.getItem("user"))._id,
+              receiverId: chatData?.isGroupChat ? chatId : receiverId,
+              chatType: chatData?.isGroupChat ? "group" : "user",
+              chatId: chatId,
+              message: res.data,
+              type: "new",
+            });
+            setMessages((prev) => [...prev, res.data]);
 
-  const receiverId = chatData?.participants?.find(
-    (participant) =>
-      participant.userId._id !== JSON.parse(localStorage.getItem("user"))._id
-  )?.userId?._id;
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    axiosIntance
-      .post(
-        `/message/${chatId}`,
-        { text: message },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      )
-      .then((res) => {
-        setMessage("");
-        console.log(res.data);
-        setSendMessage({
-          // receiverId: chatId,
-          senderId: JSON.parse(localStorage.getItem("user"))._id,
-          receiverId: chatData?.isGroupChat ? chatId : receiverId,
-          chatType: chatData?.isGroupChat ? "group" : "user",
-          chatId: chatId,
-          message: { text: res.data },
-        });
-        setMessages((prev) => [...prev, res.data]);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsLoading(false));
+            setSearchParams({ newMessage: JSON.stringify(res.data) });
+          })
+          .catch((err) => console.log(err))
+          .finally(() => setIsLoading(false));
+      }
+    }
   };
+  useEffect(() => {
+    if (messageToEdit) {
+      setMessage(messageToEdit.text);
+    }
+  }, [messageToEdit]);
 
   return (
-    <form onSubmit={onSubmit} className="relative">
-      {isLoading && (
-        <div className="w-full h-full flex justify-center items-center absolute bg-black bg-opacity-50 rounded-xl">
-          <FaSpinner className="animate-spin text-white text-2xl" />
-        </div>
-      )}
-      <input
-        onChange={(e) => setMessage(e.target.value)}
-        type="text"
-        disabled={isLoading}
-        value={message}
-        placeholder="Your message"
-        className="w-full py-3 px-6 rounded-xl bg-slate-800 text-white"
-      />
-    </form>
+    <>
+      <div className="relative">
+        {messageToEdit && (
+          <p className="text-white relative mx-2 font-semibold bg-slate-600 rounded-xl p-3 flex justify-between items-center">
+            {messageToEdit.text}
+            <span className="absolute top-2 right-2 text-xs font-semibold">
+              Editing
+            </span>
+            <button></button>
+          </p>
+        )}
+        {replayToMessage && (
+          <p className="text-white relative mx-2 font-semibold bg-slate-600 rounded-xl p-3 flex justify-between items-center">
+            {replayToMessage.text}
+            <span className="absolute top-2 right-2 text-xs font-semibold">
+              Replay to
+            </span>
+          </p>
+        )}
+        {isLoading && (
+          <div className="w-full h-full flex justify-center items-center absolute bg-black bg-opacity-50 rounded-xl">
+            <FaSpinner className="animate-spin text-white text-2xl" />
+          </div>
+        )}
+        <InputEmojiWithRef
+          value={message}
+          onChange={setMessage}
+          cleanOnEnter
+          onEnter={onSubmit}
+          placeholder="Type a message"
+        />
+      </div>
+    </>
   );
 };
 

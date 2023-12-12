@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.react-input-emoji--input {
+  @apply w-full py-3 px-4 rounded-xl bg-slate-800 text-white;
+}
+.react-input-emoji--container {
+  border: none !important;
+}
+.message_card .react-input-emoji--container {
+  display: none !important;
+}
+.message_card .react-emoji-picker--wrapper {
+  bottom: 0 !important;
+  right: 50% !important;
+  transform: translateX(50%) !important;
+}

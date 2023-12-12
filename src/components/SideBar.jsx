@@ -1,14 +1,19 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axiosIntance from "../config/axios.config";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ChatCard from "./ChatCard";
+import { IoCloseSharp } from "react-icons/io5";
+import { SocketContext } from "../App";
 
-const SideBar = () => {
+const SideBar = ({ setIsMenuOpen }) => {
+  const socket = useContext(SocketContext);
   const [createChatTo, setCreateChatTo] = useState("");
   const [myChats, setMyChats] = useState([]);
   const nav = useNavigate();
   const myData = JSON.parse(localStorage.getItem("user"));
+  const [searchParams, setSearchParams] = useSearchParams();
+
   useEffect(() => {
     getMyChats();
   }, []);
@@ -38,9 +43,44 @@ const SideBar = () => {
         setMyChats(res.data.data);
       });
   };
+  const updateChat = (data) => {
+    if (data.type === "new") {
+      const thisChatId = data.message.chatId;
+      let thisChat = myChats.find((chat) => chat._id === thisChatId);
+      thisChat = { ...thisChat, lastMessage: data.message };
+      setMyChats((prev) => [
+        thisChat,
+        ...prev.filter((chat) => chat._id !== thisChatId),
+      ]);
+    }
+  };
+  useEffect(() => {
+    if (socket) {
+      socket.on("update-chat", (data) => {
+        updateChat(data);
+      });
+    }
+    return () => {
+      if (socket) {
+        socket.off("update-chat");
+      }
+    };
+  }, [socket, myChats]);
+  useEffect(() => {
+    if (searchParams.get("newMessage")) {
+      const newMessage = JSON.parse(searchParams.get("newMessage"));
+      updateChat({ message: newMessage, type: "new" });
+      setSearchParams({});
+    }
+  }, [searchParams]);
   return (
-    <div className="space-y-8 p-8 bg-slate-900 text-white rounded-xl w-[400px]">
-      <h1 className="font-semibold text-2xl text-center">Chats</h1>
+    <div className="space-y-8 p-8 bg-slate-800 h-full sm:bg-slate-900 text-white rounded-xl w-full sm:w-[300px] md:w-[400px] max-h-screen overflow-auto">
+      <h1 className="font-semibold text-2xl sm:text-center sm:block flex justify-between items-center">
+        <span>Chats</span>
+        <button onClick={() => setIsMenuOpen(false)} className="sm:hidden">
+          <IoCloseSharp />
+        </button>
+      </h1>
       <div>
         <span className="font-semibold">my id : </span>
         <span
@@ -62,7 +102,7 @@ const SideBar = () => {
           value={createChatTo}
         />
       </form>
-      <div className="space-y-4 max-h-[50vh] overflow-auto">
+      <div className="space-y-4 ">
         {myChats.map((chat) => (
           <ChatCard key={chat._id} data={chat} />
         ))}

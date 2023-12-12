@@ -1,22 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import axiosIntance from "../config/axios.config";
 import ChatHeader from "./ChatHeader";
-import MessageCard from "./MessageCard";
 import MessageSender from "./MessageSender";
-import { io } from "socket.io-client";
-import { BASE_URL } from "../App";
+import { SocketContext } from "../App";
 import { useParams } from "react-router-dom";
-
-const ChatBox = () => {
+import MessageCard from "./MessageCard/MessageCard";
+export const ChatContext = createContext();
+const ChatBox = ({ setIsMenuOpen }) => {
   const chatId = useParams().id;
-  const socket = useRef();
+  const socket = useContext(SocketContext);
   const myId = JSON.parse(localStorage.getItem("user"))._id;
   const [messages, setMessages] = useState([]);
   const [chatDetails, setChatDetails] = useState({});
   const [sendMessage, setSendMessage] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [replayToMessage, setReplayToMessage] = useState(null);
+  const [messageToEdit, setMessageToEdit] = useState(null);
+  const messagesContainerRef = useRef(null);
   // Get the chat in chat section
-
   useEffect(() => {
     axiosIntance
       .get(`/chat/${chatId}/details`, {
@@ -39,75 +40,104 @@ const ChatBox = () => {
       })
       .catch((err) => console.log(err));
   }, [chatId]);
-
-  // Connect to Socket.io
-
   useEffect(() => {
-    // socket.current = io("ws://localhost:8000", {
-    socket.current = io("https://gp-f2nx.onrender.com", {
-      query: {
-        token: localStorage.getItem("token"),
-      },
-    });
-    socket.current.emit("new-user-in-chat", {
-      user: myId,
-      chat: chatId,
-    });
-    socket.current.on("get-users", (users) => {
-      setOnlineUsers(users);
-    });
+    if (socket) {
+      socket.emit("new-user-in-chat", {
+        user: myId,
+        chat: chatId,
+      });
+      socket.on("get-users", (users) => {
+        setOnlineUsers(users);
+      });
+      return () => {
+        socket.off("get-users");
 
-    return () => {
-      socket.current.disconnect();
-    };
-  }, [chatId]);
+        socket.emit("user-leave-chat", {
+          user: myId,
+          chat: chatId,
+        });
+      };
+    }
+  }, [chatId, socket]);
   useEffect(() => {
-    if (chatDetails?.isGroupChat) {
-      console.log("create group chat");
-      console.log(chatDetails);
-      socket.current.emit("create-group-chat", {
+    if (chatDetails?.isGroupChat && socket) {
+      socket.emit("create-group-chat", {
         chatId,
         members: chatDetails?.participants?.map(
           (participant) => participant?.userId?._id
         ),
       });
     }
-  }, [chatDetails]);
+  }, [chatDetails, socket]);
   // Send Message to socket server
-
   useEffect(() => {
-    if (sendMessage !== null) {
-      socket.current.emit("send-message", sendMessage);
+    if (sendMessage !== null && socket) {
+      socket.emit("send-message", sendMessage);
     }
-  }, [sendMessage]);
-
+  }, [sendMessage, socket]);
   // Get the message from socket server
-
+  console.log(messages);
   useEffect(() => {
-    socket.current.on("receive-message", (data) => {
-      console.log("Received message:", data);
-      setMessages((prev) => [...prev, data.text]);
-    });
-    socket.current.on("receive-group-message", (data) => {
-      console.log("Received message:", data);
-      setMessages((prev) => [...prev, data.text]);
-    });
-  }, []);
+    if (socket) {
+      socket.on("receive-message", (data) => {
+        if (data.type === "edit") {
+          setMessages((prev) =>
+            prev.map((message) =>
+              message._id === data.message._id ? data.message : message
+            )
+          );
+        } else {
+          setMessages((prev) => [...prev, data.message]);
+        }
+      });
+      socket.on("deleted-message", (data) => {
+        setMessages((prev) =>
+          prev.filter((message) => message._id !== data.messageId)
+        );
+      });
+    }
+    return () => {
+      if (socket) {
+        socket.off("receive-message");
+        socket.off("deleted-message");
+      }
+    };
+  }, [socket]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  };
   return (
-    <div className="w-full bg-slate-900 p-6 rounded-xl flex flex-col gap-8">
-      <ChatHeader chatDetails={chatDetails} />
-      <div className="h-full space-y-4">
-        {messages.map((message) => (
-          <MessageCard key={message._id} data={message} />
-        ))}
+    <ChatContext.Provider
+      value={{
+        chatData: chatDetails,
+        setSendMessage,
+        setMessages,
+        replayToMessage,
+        setReplayToMessage,
+        messageToEdit,
+        setMessageToEdit,
+      }}
+    >
+      <div className="w-full bg-slate-900 p-6 rounded-xl flex flex-col gap-4 max-h-screen">
+        <ChatHeader setIsMenuOpen={setIsMenuOpen} />
+        <div
+          className="h-full space-y-4 overflow-auto"
+          ref={messagesContainerRef}
+        >
+          {messages.map((message) => (
+            <MessageCard key={message._id} message={message} />
+          ))}
+        </div>
+        <MessageSender />
       </div>
-      <MessageSender
-        setMessages={setMessages}
-        chatData={chatDetails}
-        setSendMessage={setSendMessage}
-      />
-    </div>
+    </ChatContext.Provider>
   );
 };
 

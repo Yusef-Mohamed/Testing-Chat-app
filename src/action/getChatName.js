@@ -4,7 +4,7 @@ export const getChatName = (chatDetails) => {
   }
   const myId = JSON.parse(localStorage.getItem("user"))._id;
   const anthorUser = chatDetails?.participants?.find(
-    (participant) => participant?.userId?._id !== myId
+    (participant) => participant?._id !== myId
   );
-  return anthorUser?.userId?.username;
+  return anthorUser?.username;
 };
