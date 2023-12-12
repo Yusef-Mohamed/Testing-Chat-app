@@ -57,6 +57,8 @@ const SideBar = ({ setIsMenuOpen }) => {
   useEffect(() => {
     if (socket) {
       socket.on("update-chat", (data) => {
+        console.log("chats", data);
+
         updateChat(data);
       });
     }

@@ -80,6 +80,7 @@ const ChatBox = ({ setIsMenuOpen }) => {
   useEffect(() => {
     if (socket) {
       socket.on("receive-message", (data) => {
+        console.log("receive", data);
         if (data.type === "edit") {
           setMessages((prev) =>
             prev.map((message) =>
@@ -91,6 +92,8 @@ const ChatBox = ({ setIsMenuOpen }) => {
         }
       });
       socket.on("deleted-message", (data) => {
+        console.log("delete", data);
+
         setMessages((prev) =>
           prev.filter((message) => message._id !== data.messageId)
         );
