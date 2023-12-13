@@ -4,6 +4,7 @@ import ReplayToMessage from "./ReplayToMessage";
 import DeleteMessage from "./DeleteMessage";
 import EditMessage from "./EditMessage";
 import { IoCloseOutline } from "react-icons/io5";
+import Modal from "../Modal/Modal";
 const MessageCard = ({ message }) => {
   const myId = JSON.parse(localStorage.getItem("user"))._id;
   const isMine = myId === message?.senderId;
@@ -65,33 +66,15 @@ const MessageCard = ({ message }) => {
           )}
         </div>
       </div>
-      {repaliesOpen && (
-        <div
-          onClick={(e) => {
-            if (e.target.classList.contains("fixed")) setRepaliesOpen(false);
-          }}
-          style={{ marginTop: "0" }}
-          className="fixed z-10 w-full h-full flex items-center justify-center top-0 right-0 backdrop-blur-sm cursor-pointer"
+      <Modal onClose={() => setRepaliesOpen(false)} isOpen={repaliesOpen}>
+        <p
+          className={`p-4 min-w-[40vw] rounded-xl font-semibold text-white ${
+            isMine ? "bg-sky-600" : "bg-slate-600 order-2"
+          }`}
         >
-          <div className="bg-slate-800 rounded-xl p-10 relative">
-            <p
-              className={`p-4 min-w-[40vw] rounded-xl font-semibold text-white ${
-                isMine ? "bg-sky-600" : "bg-slate-600 order-2"
-              }`}
-            >
-              {message?.repliedTo?.text}
-            </p>
-            <button
-              className=" absolute top-4 right-4 w-6 h-6 flex items-center justify-center border rounded-full "
-              onClick={() => {
-                setRepaliesOpen(false);
-              }}
-            >
-              <IoCloseOutline className="text-white" />
-            </button>
-          </div>
-        </div>
-      )}
+          {message?.repliedTo?.text}
+        </p>
+      </Modal>
     </>
   );
 };

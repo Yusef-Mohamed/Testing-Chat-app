@@ -118,6 +118,7 @@ const ChatBox = ({ setIsMenuOpen }) => {
   return (
     <ChatContext.Provider
       value={{
+        setChatDetails,
         chatData: chatDetails,
         setSendMessage,
         setMessages,
@@ -127,7 +128,7 @@ const ChatBox = ({ setIsMenuOpen }) => {
         setMessageToEdit,
       }}
     >
-      <div className="w-full bg-slate-900 p-6 rounded-xl flex flex-col gap-4 max-h-screen">
+      <div className="w-full bg-slate-900 p-6 rounded-xl flex flex-col gap-4 max-h-screen relative">
         <ChatHeader setIsMenuOpen={setIsMenuOpen} />
         <div
           className="h-full space-y-4 overflow-auto"

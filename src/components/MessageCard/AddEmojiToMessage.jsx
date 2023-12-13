@@ -46,7 +46,7 @@ const AddEmojiToMessage = ({ id, setEmojiMenuOpen, emojiMenuOpen }) => {
     <div className="relative">
       <button
         className=" text-xl opacity-50 hover:opacity-100 transition-all "
-        onClick={() => setEmojiMenuOpen(true)}
+        onClick={() => setEmojiMenuOpen((prev) => !prev)}
       >
         😁
       </button>
