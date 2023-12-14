@@ -7,7 +7,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import Modal from "../Modal/Modal";
 const MessageCard = ({ message }) => {
   const myId = JSON.parse(localStorage.getItem("user"))._id;
-  const isMine = myId === message?.senderId;
+  const isMine = myId === message?.senderId?._id;
   const [emojiMenuOpen, setEmojiMenuOpen] = useState(false);
   const [repaliesOpen, setRepaliesOpen] = useState(false);
   return (
