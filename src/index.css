@@ -15,3 +15,15 @@
   right: 50% !important;
   transform: translateX(50%) !important;
 }
+.scrolled_to {
+  animation: flash 2s ease-in-out;
+  -webkit-animation: flash 2s ease-in-out;
+}
+@keyframes flash {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}

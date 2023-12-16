@@ -10,31 +10,55 @@ const MessageCard = ({ message }) => {
   const isMine = myId === message?.senderId?._id;
   const [emojiMenuOpen, setEmojiMenuOpen] = useState(false);
   const [repaliesOpen, setRepaliesOpen] = useState(false);
+  const replayToMessage = message?.repliedTo ? message.repliedTo : null;
+  let isReplayedMine = false;
+  if (replayToMessage) {
+    isReplayedMine = replayToMessage?.senderId?._id === myId;
+  }
+
   return (
     <>
       <div
+        id={message?._id}
         className={`w-fit flex ${
           isMine ? "" : "ml-auto flex-row-reverse"
         } message_card items-center group `}
       >
         <div className={`w-[40vw] sm:w-[30vw] relative `}>
-          <p
+          <div
             className={`p-4 rounded-xl font-semibold text-white ${
               isMine ? "bg-sky-600" : "bg-slate-600 order-2"
             }`}
           >
-            {message.text}
-          </p>
-          {message?.repliedTo && (
-            <button
-              className="text-gray-400 mx-2 text-sm cursor-pointer"
-              onClick={() => {
-                setRepaliesOpen(true);
-              }}
-            >
-              Replayed message{" "}
-            </button>
-          )}
+            {replayToMessage && (
+              <p
+                onClick={() => {
+                  const message = document.getElementById(replayToMessage._id);
+                  message?.classList?.add("scrolled_to");
+                  message?.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    message?.classList?.remove("scrolled_to");
+                  }, 2000);
+                }}
+                className={`p-2 bg-white cursor-pointer bg-opacity-20 rounded-md text-sm overflow-hidden line-clamp-2 border-l-[6px] ${
+                  isReplayedMine ? " border-l-slate-800" : "border-l-sky-800"
+                }`}
+              >
+                <div>
+                  {isReplayedMine ? (
+                    "you"
+                  ) : (
+                    <span className="inline-block">
+                      {replayToMessage.senderId.username}
+                    </span>
+                  )}
+                </div>
+                {replayToMessage.text}
+              </p>
+            )}
+
+            <p>{message.text}</p>
+          </div>
 
           <div className="absolute flex gap-4 items-center -bottom-4">
             {message?.reactions?.map((reaction) => (

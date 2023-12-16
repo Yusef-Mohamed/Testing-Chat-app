@@ -84,6 +84,10 @@ const SideBar = ({ setIsMenuOpen }) => {
         </button>
       </h1>
       <div>
+        <span className="font-semibold">my name : </span>
+        <span>{myData?.username}</span>
+      </div>
+      <div>
         <span className="font-semibold">my id : </span>
         <span
           className="cursor-pointer underline"

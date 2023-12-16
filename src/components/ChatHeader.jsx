@@ -7,8 +7,8 @@ import { IoCloseOutline } from "react-icons/io5";
 
 const ChatHeader = ({ setIsMenuOpen }) => {
   const { chatData } = useContext(ChatContext);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(true);
-  console.log(chatData);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  console.log(getChatName(chatData));
   return (
     <>
       <div>
