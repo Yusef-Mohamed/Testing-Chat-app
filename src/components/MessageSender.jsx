@@ -118,7 +118,7 @@ const MessageSender = () => {
           </p>
         )}
         {isLoading && (
-          <div className="w-full h-full flex justify-center items-center absolute bg-black bg-opacity-50 rounded-xl">
+          <div className="w-full z-50 h-full flex justify-center items-center absolute top-0 bg-black bg-opacity-75  rounded-xl">
             <FaSpinner className="animate-spin text-white text-2xl" />
           </div>
         )}

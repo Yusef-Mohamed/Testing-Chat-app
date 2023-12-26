@@ -1,4 +1,4 @@
-export const getChatName = (chatDetails) => {
+export const getChatName = (chatDetails, name) => {
   if (chatDetails?.isGroupChat) {
     return chatDetails?.groupName;
   }
@@ -6,6 +6,8 @@ export const getChatName = (chatDetails) => {
   const anthorUser = chatDetails?.participants?.find(
     (participant) => participant?.userId !== myId
   );
-  console.log(anthorUser);
+  if (name === "header") {
+    return anthorUser?.userId?.username;
+  }
   return anthorUser?.username;
 };

@@ -18,6 +18,18 @@ const ChatBox = ({ setIsMenuOpen }) => {
   const [messageToEdit, setMessageToEdit] = useState(null);
   const messagesContainerRef = useRef(null);
   // Get the chat in chat section
+  const markAsSeen = () => {
+    axiosIntance
+      .put(`/chat/${chatId}/markasread`, null, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  };
   useEffect(() => {
     axiosIntance
       .get(`/chat/${chatId}/details`, {
@@ -39,9 +51,12 @@ const ChatBox = ({ setIsMenuOpen }) => {
         setMessages(res.data);
       })
       .catch((err) => console.log(err));
+    markAsSeen();
   }, [chatId]);
+
   useEffect(() => {
     if (socket) {
+      console.log("joining");
       socket.emit("new-user-in-chat", {
         user: myId,
         chat: chatId,
@@ -79,8 +94,22 @@ const ChatBox = ({ setIsMenuOpen }) => {
   // Get the message from socket server
   useEffect(() => {
     if (socket) {
+      socket.on("see-from", (data) => {
+        console.log("seeeing");
+        setMessages((prev) =>
+          prev.map((message, ind) => {
+            if (ind === prev.length - 1) {
+              return {
+                ...message,
+                seendBy: [...message.seendBy.filter((e) => e != data), data],
+              };
+            }
+            return message;
+          })
+        );
+      });
+
       socket.on("receive-message", (data) => {
-        console.log("receive", data);
         if (data.type === "edit") {
           setMessages((prev) =>
             prev.map((message) =>
@@ -88,7 +117,13 @@ const ChatBox = ({ setIsMenuOpen }) => {
             )
           );
         } else {
+          markAsSeen();
           setMessages((prev) => [...prev, data.message]);
+          socket.emit("see-message", {
+            receiverId: data.message.senderId._id,
+            chatId: data.message.chatId,
+            senderId: myId,
+          });
         }
       });
       socket.on("deleted-message", (data) => {
@@ -101,6 +136,7 @@ const ChatBox = ({ setIsMenuOpen }) => {
     return () => {
       if (socket) {
         socket.off("receive-message");
+        socket.off("see-from");
         socket.off("deleted-message");
       }
     };
@@ -134,8 +170,12 @@ const ChatBox = ({ setIsMenuOpen }) => {
           className="h-full space-y-4 overflow-auto"
           ref={messagesContainerRef}
         >
-          {messages.map((message) => (
-            <MessageCard key={message._id} message={message} />
+          {messages.map((message, ind) => (
+            <MessageCard
+              key={message._id}
+              isLaseMessage={ind == messages.length - 1}
+              message={message}
+            />
           ))}
         </div>
         <MessageSender />

@@ -1,21 +1,29 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import AddEmojiToMessage from "./AddEmojiToMessage";
 import ReplayToMessage from "./ReplayToMessage";
 import DeleteMessage from "./DeleteMessage";
 import EditMessage from "./EditMessage";
-import { IoCloseOutline } from "react-icons/io5";
-import Modal from "../Modal/Modal";
-const MessageCard = ({ message }) => {
+import { LuCheckCheck } from "react-icons/lu";
+import { ChatContext } from "../ChatBox";
+
+const MessageCard = ({ message, isLaseMessage }) => {
   const myId = JSON.parse(localStorage.getItem("user"))._id;
   const isMine = myId === message?.senderId?._id;
   const [emojiMenuOpen, setEmojiMenuOpen] = useState(false);
-  const [repaliesOpen, setRepaliesOpen] = useState(false);
   const replayToMessage = message?.repliedTo ? message.repliedTo : null;
   let isReplayedMine = false;
   if (replayToMessage) {
     isReplayedMine = replayToMessage?.senderId?._id === myId;
   }
 
+  const { chatData } = useContext(ChatContext);
+  let isSeen = false;
+  const length = message?.seendBy?.filter((id) => id != myId)?.length;
+  if (chatData?.isGroupChat) {
+    if (length === chatData?.participants?.length - 1) isSeen = true;
+  } else {
+    if (length === 1) isSeen = true;
+  }
   return (
     <>
       <div
@@ -31,7 +39,7 @@ const MessageCard = ({ message }) => {
             }`}
           >
             {replayToMessage && (
-              <p
+              <div
                 onClick={() => {
                   const message = document.getElementById(replayToMessage._id);
                   message?.classList?.add("scrolled_to");
@@ -53,12 +61,19 @@ const MessageCard = ({ message }) => {
                     </span>
                   )}
                 </div>
-                {replayToMessage.text}
-              </p>
+                <p>{replayToMessage.text}</p>
+              </div>
             )}
 
             <p>{message.text}</p>
           </div>
+          {isLaseMessage && isMine && (
+            <LuCheckCheck
+              className={`ml-auto mr-2 my-2 ${
+                isSeen ? "text-sky-600" : "text-slate-600"
+              } text-xl`}
+            />
+          )}
 
           <div className="absolute flex gap-4 items-center -bottom-4">
             {message?.reactions?.map((reaction) => (
@@ -90,15 +105,6 @@ const MessageCard = ({ message }) => {
           )}
         </div>
       </div>
-      <Modal onClose={() => setRepaliesOpen(false)} isOpen={repaliesOpen}>
-        <p
-          className={`p-4 min-w-[40vw] rounded-xl font-semibold text-white ${
-            isMine ? "bg-sky-600" : "bg-slate-600 order-2"
-          }`}
-        >
-          {message?.repliedTo?.text}
-        </p>
-      </Modal>
     </>
   );
 };

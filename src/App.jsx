@@ -11,7 +11,7 @@ export const BASE_URL = "https://gp-f2nx.onrender.com/api/v1";
 export const SocketContext = createContext();
 function App() {
   const token = localStorage.getItem("token");
-  const myId = JSON.parse(localStorage.getItem("user"))._id;
+  const myId = JSON.parse(localStorage.getItem("user"))?._id;
 
   const [socket, setSocket] = useState(null);
   useEffect(() => {

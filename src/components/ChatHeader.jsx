@@ -8,12 +8,12 @@ import { IoCloseOutline } from "react-icons/io5";
 const ChatHeader = ({ setIsMenuOpen }) => {
   const { chatData } = useContext(ChatContext);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  console.log(getChatName(chatData));
+
   return (
     <>
       <div>
         <h2 className="text-xl font-semibold text-white flex justify-between items-center ">
-          <span>Chat with {getChatName(chatData)}</span>
+          <span>Chat with {getChatName(chatData, "header")}</span>
           <div className="flex items-center gap-2">
             <button
               className="w-6 h-6 flex items-center justify-center bg-sky-600 rounded-full hover:bg-sky-700 transition-all"
@@ -42,7 +42,7 @@ const ChatHeader = ({ setIsMenuOpen }) => {
           Chat Details
         </h1>
         <h2 className="font-semibold text-2xl text-white text-center">
-          {getChatName(chatData)}
+          {getChatName(chatData, "header")}
         </h2>
         {chatData?.isGroupChat && (
           <>
