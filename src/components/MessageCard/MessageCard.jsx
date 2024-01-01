@@ -34,7 +34,7 @@ const MessageCard = ({ message, isLaseMessage }) => {
       >
         <div className={`w-[40vw] sm:w-[30vw] relative `}>
           <div
-            className={`p-4 rounded-xl font-semibold text-white ${
+            className={`p-4 rounded-xl font-semibold text-white max-w-full overflow-hidden ${
               isMine ? "bg-sky-600" : "bg-slate-600 order-2"
             }`}
           >

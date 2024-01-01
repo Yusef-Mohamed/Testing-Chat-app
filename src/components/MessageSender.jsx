@@ -103,18 +103,33 @@ const MessageSender = () => {
         {messageToEdit && (
           <p className="text-white relative mx-2 font-semibold bg-slate-600 rounded-xl p-3 flex justify-between items-center">
             {messageToEdit.text}
-            <span className="absolute top-2 right-2 text-xs font-semibold">
+            <span className="absolute top-2 right-10 text-xs font-semibold">
               Editing
             </span>
-            <button></button>
+            <button
+              onClick={() => {
+                setMessageToEdit(null);
+              }}
+              className="text-rose-500 font-semibold absolute top-2 right-2 text-xs font-semibold"
+            >
+              close
+            </button>
           </p>
         )}
         {replayToMessage && (
           <p className="text-white relative mx-2 font-semibold bg-slate-600 rounded-xl p-3 flex justify-between items-center">
             {replayToMessage.text}
-            <span className="absolute top-2 right-2 text-xs font-semibold">
+            <span className="absolute top-2 right-10 text-xs font-semibold">
               Replay to
             </span>
+            <button
+              onClick={() => {
+                setReplayToMessage(null);
+              }}
+              className="text-rose-500 font-semibold absolute top-2 right-2 text-xs font-semibold"
+            >
+              close
+            </button>
           </p>
         )}
         {isLoading && (
