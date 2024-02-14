@@ -110,7 +110,7 @@ const MessageSender = () => {
               onClick={() => {
                 setMessageToEdit(null);
               }}
-              className="text-rose-500 font-semibold absolute top-2 right-2 text-xs font-semibold"
+              className="text-rose-500 absolute top-2 right-2 text-xs font-semibold"
             >
               close
             </button>
@@ -126,7 +126,7 @@ const MessageSender = () => {
               onClick={() => {
                 setReplayToMessage(null);
               }}
-              className="text-rose-500 font-semibold absolute top-2 right-2 text-xs font-semibold"
+              className="text-rose-500 absolute top-2 right-2 text-xs font-semibold"
             >
               close
             </button>
