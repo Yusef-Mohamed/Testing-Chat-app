@@ -16,8 +16,8 @@ function App() {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
     if (token) {
-      const data = io("ws://localhost:8000", {
-        // const data = io("https://gp-f2nx.onrender.com", {
+      // const data = io("ws://localhost:8000", {
+      const data = io("https://gp-f2nx.onrender.com", {
         query: {
           token: localStorage.getItem("token"),
         },
