@@ -7,7 +7,7 @@ import Chat from "./page/Chat";
 import { createContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 // export const BASE_URL = "http://localhost:8000/api/v1";
-export const BASE_URL = "https://gp-f2nx.onrender.com/api/v1";
+export const BASE_URL = "http://20.199.94.164:8000/api/v1";
 export const SocketContext = createContext();
 function App() {
   const token = localStorage.getItem("token");
@@ -17,7 +17,7 @@ function App() {
   useEffect(() => {
     if (token) {
       // const data = io("ws://localhost:8000", {
-      const data = io("https://gp-f2nx.onrender.com", {
+      const data = io("http://20.199.94.164:8000", {
         query: {
           token: localStorage.getItem("token"),
         },
